@@ -1,0 +1,147 @@
+The files should be on copied to desktop
+
+
+sudo apt-get install flex
+sudo apt-get install flex-old
+cd desktop
+cd lexicalanalyzerporject
+flex flex.l
+gcc lex.yy.c -lfl
+./a.out
+
+
+Project Summary:
+Mini-Pascal is a simplified (and slightly modified) subset of Pascal. ... Mini-Pascal allows nested functions and procedures, i.e. subroutines
+which are defined within another.
+
+
+
+
+Project Details:
+Lexical Specification: (1) Identifiers are sequences of letters and digits.  The first character must be a letter.  Identifiers  are not case‐sensitive 
+(2) Numbers are integers or reals (floats).  
+ (3) Strings are sequences of any characters enclosed in quote marks.  
+Muhammad Muneeb Jawaid 62136 (MCS) Syed Faizan Ali Bukhari 60438 (MCS)
+Compiler Construction
+   
+ 
+   
+ 
+ string -->  ' " ' {character} ' " ' | " ' " {character} " ' " (4) Operators and delimiters are either special characters or reserved words.  Reserved words  cannot be used as identifiers.  
+The operators and delimiters composed of special characters are:  
+:=            assignment 
++             (unary or binary), addition, set union 
+-              (unary or binary), subtraction, set difference 
+*             multiplication, set intersection / real division 
+div          integer division 
+mod       integer modulus 
+=             equal 
+<>           unequal 
+<             less than 
+>             greater than 
+<=            less than or equal 
+>=            greater than or equal in set membership 
+not          logical negation 
+or            logical disjunction 
+and         logical conjunction 
+()             parentheses 
+[]             index brackets for arrays or sets 
+{}             comment brackets 
+(* *)        comment brackets  
+, . ; : .. ^   other symbols 
+ 
+Operators are defined by the following:  
+UnaryOperator --> '+' | '-' 
+MultOperator --> '*' | '/' | div | mod | and 
+AddOperator --> '+' | '-' | or 
+Relation --> '=' | '<>' | '<' | '>' | '<=' | '>=' | in         
+   
+ 
+   
+ 
+ 
+The reserved words are enumerated in the following list (although we will not use all of them). 
+and           downto           if                or                     then           array           else           in           packed           to 
+begin        end                  label         procedure      type           case             file           mod       program     until 
+const         for                   nil              record           var           div           function           not           repeat       
+while           do           goto           of           set           with 
+ 
+Standard identifiers are as follows:   Constants:    False, True Types: Integer, Boolean, Real, Char 
+Functions:   Abs, ArcTan, Chr, Cos, EOF, EOLN, Exp, Ln, Odd, Ord, Pred, Round, Sin, Sqr, Sqrt, Succ, Trunc 
+Procedures:   Get, New, Dispose, Pack, Page, Put, Read, Readln, Reset, Rewrite, Unpack, Write, Writeln 
+ 
+Reference: http://pascal-central.com/docs/iso7185.pdf 
+ 
+ 
+Grammar: All non‐terminals start with a capital letter.  All lexical elements  (terminals) are lowercase.  All reserved words and lexical tokens such as ident are the word  itself preceded with the letter 'y' , for example,   if is yif,  ident is yident, etc.  
+CompilationUnit --> ProgramModule 
+ProgramModule --> yprogram yident ProgramParameters ';' Block '.' 
+ProgramParameters --> '(' IdentList ')' 
+IdentList --> yident {',' yident} 
+Block --> [Declarations] StatementSequence 
+Declarations --> [ConstantDefBlock] [TypeDefBlock] [VariableDeclBlock] [SubprogDeclList] 
+ConstantDefBlock --> yconst ConstantDef ';' {ConstantDef ';'} 
+TypeDefBlock --> ytype TypeDef ';' {TypeDef ';'} 
+VariableDeclBlock --> yvar VariableDecl ';' {VariableDecl ';'} 
+ConstantDef --> yident '=' ConstExpression 
+TypeDef --> yident '=' Type 
+   
+ 
+   
+ 
+VariableDecl --> IdentList ':' Type 
+ConstExpression --> [UnaryOperator] ConstFactor | " ' " ycharacter " ' " | ynil 
+ConstFactor --> yident | ynumber | ytrue | yfalse | ynil 
+Type --> yident | ArrayType | PointerType | RecordType | SetType 
+ArrayType --> yarray '[' Subrange {',' Subrange} ']' yof Type 
+Subrange --> ConstFactor '..' ConstFactor | " ' " ycharacter '..' ycharacter " ' " 
+RecordType --> yrecord FieldListSequence yend  
+SetType --> yset yof Subrange 
+PointerType --> '^' yident 
+FieldListSequence --> FieldList {';' FieldList} 
+FieldList --> IdentList ':' Type 
+StatementSequence --> ybegin Statement {';' Statement} yend 
+Statement --> Assignment | ProcedureCall | IfStatement | CaseStatement | WhileStatement | RepeatStatement | ForStatement | IOStatement | MemoryStatement | StatementSequence | empty 
+Assignment --> Designator ':=' Expression 
+ProcedureCall --> yident [ActualParameters] 
+IfStatement --> yif Expression ythen Statement [yelse Statement] 
+CaseStatement --> ycase Expression yof Case {';' Case} yend 
+Case --> CaseLabelList ':' Statement 
+CaseLabelList --> ConstExpression {',' ConstExpression } 
+WhileStatement --> ywhile Expression ydo Statement 
+RepeatStatement --> yrepeat StatementSequence yuntil Expression 
+ForStatement --> yfor yident ':=' Expression WhichWay Expression ydo Statement 
+WhichWay --> yto | ydownto 
+IOStatement --> yread '(' DesignatorList ')' | yreadln [ '(' DesignatorList ')' ] | ywrite '(' ExpList ')' | ywriteln [ '(' ExpList ')' ] 
+DesignatorList --> Designator {',' Designator } 
+Designator --> yident [ DesignatorStuff ] 
+DesignatorStuff --> {'.' yident | '[' ExpList ']' | '^' } 
+   
+ 
+   
+ 
+ActualParameters --> '(' ExpList ')' 
+ExpList --> Expression { ',' Expression } 
+MemoryStatement --> ynew '(' yident ')' | ydispose '(' yident ')'  
+Expression --> SimpleExpression [ Relation SimpleExpression ] 
+SimpleExpression --> [UnaryOperator] Term {AddOperator Term} 
+Term --> Factor {MultOperator Factor} 
+Factor --> ynumber | ystring | ytrue | yfalse | ynil | Designator | '(' Expression ')' | ynot Factor | Setvalue | FunctionCall 
+Setvalue --> '[' [Element {',' Element} ] ']' 
+FunctionCall --> yident ActualParameters 
+Element --> ConstExpression ['..' ConstExpression ]  
+SubprogDeclList --> {ProcedureDecl ';' | FunctionDecl ';'}  
+ProcedureDecl --> ProcedureHeading ';' Block  
+FunctionDecl --> FunctionHeading ':' yident ';' Block  
+ProcedureHeading --> yprocedure yident [FormalParameters]  
+FunctionHeading --> yfunction yident [FormalParameters]  
+FormalParameters --> '(' OneFormalParam {';' OneFormalParam} ')'  
+OneFormalParam --> [yvar] IdentList ':' yident 
+
+
+
+
+
+Author:
+Muhammad Muneeb 62136 MCS
+Syed Faizan Ali Bukhari 60438 MCS
